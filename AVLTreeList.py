@@ -4,7 +4,7 @@
 #id2      - complete info
 #name2    - complete info  
 
-
+from random import randrange
 
 """A class represnting a node in an AVL tree"""
 
@@ -368,7 +368,26 @@ class AVLTreeList(object):
 	@returns: an AVLTreeList where the values are sorted by the info of the original list.
 	"""
 	def sort(self):
-		return None
+		sortedArr = self.quickSort(self.listToArray())
+		sortedAVLlist = AVLTreeList()
+		n = len(sortedArr)
+		for i in range(n):
+			sortedAVLlist.insert(sortedArr[i])
+
+	def quickSort(self,arr):
+		pIndex = randrange(0,arr.size())
+		pivot = arr[pIndex]
+		smallerElements = []
+		equalElemens = []
+		biggerElements = []
+		for info in arr:
+			if info < pivot:
+				smallerElements.append(info)
+			elif info == pivot:
+				equalElemens.append(info)
+			elif info > pivot:
+				biggerElements.append(info)
+		return self.quickSort(smallerElements) + equalElemens + self.quickSort(biggerElements)
 
 	"""permute the info values of the list 
 
@@ -376,7 +395,18 @@ class AVLTreeList(object):
 	@returns: an AVLTreeList where the values are permuted randomly by the info of the original list. ##Use Randomness
 	"""
 	def permutation(self):
-		return None
+		arr = self.listToArray()
+		n = len(arr)
+		permutatonTheta = AVLTreeList()
+		wasAllreadyRolled = [False] * n
+		i = 0
+		while i < n:
+			randRes = randrange(n)
+			if wasAllreadyRolled[randRes] == False:
+				permutatonTheta.insert(0,arr[randRes])
+				wasAllreadyRolled[randRes] = True
+				i += 1
+		return permutatonTheta
 
 	"""concatenates lst to self
 
