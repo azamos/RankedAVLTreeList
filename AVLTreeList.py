@@ -255,11 +255,22 @@ class AVLTreeList(object):
 
 	#TODO: finish this
 	def determineOperationAndExecute(self,criminalNode):
+		counter = 0;
 		bf = criminalNode.getBalanceFactor()
 		if bf == -2:
-			return 2
+			rightChildBalanceFactor = criminalNode.getRight().getBalanceFactor()
+			if rightChildBalanceFactor == 1:
+				self.rotateRight(criminalNode)
+				counter += 1
+			self.rotateLeft(criminalNode)
 		if bf == 2:
-			return 2
+			leftChildBalanceFactor = criminalNode.getRight().getBalanceFactor()
+			if leftChildBalanceFactor == -1:
+				self.rotateLeft(criminalNode)
+				counter+=1
+			self.rotateRight(criminalNode)
+		counter += 1
+		return counter
 
 	def rebalanceTree(self, leaf):
 		rebalances = 0
