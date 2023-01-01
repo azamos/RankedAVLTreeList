@@ -20,7 +20,7 @@ class AVLNode(object):
 		self.right = None
 		self.parent = None
 		self.height = -1 # Balance factor
-		self.key = None # Rank
+		self.key = 0 # Rank
 		self.size = 1
 		self.real = True
 
@@ -185,7 +185,7 @@ class AVLTreeList(object):
 
 	def defUpdateRanksinPath(self,i):
 		self.root.setRank(self.root.getRank()+1)
-		p = self.root.getRight() if self.root.getRank() > i else self.root.
+		p = self.root.getRight() if self.root.getRank() > i else self.root
 		while p.isRealNode():
 			parentRank = p.getParent().getRank()
 			if p.isLeftChild():
@@ -213,6 +213,7 @@ class AVLTreeList(object):
 				p = p.getLeft()
 			elif p.getRank() < i:
 				p = p.getRight()
+		return p
 
 	"""inserts val at position i in the list
 
@@ -291,7 +292,7 @@ class AVLTreeList(object):
 		rotationsCounter = 0
 
 		newNode = AVLNode(val)
-		newNode.setKey(i)
+		newNode.setRank(i)
 		newNode.makeLeaf()
 		if self.empty():
 			self.root = newNode
@@ -300,18 +301,44 @@ class AVLTreeList(object):
 			self.minimum = newNode
 			return rotationsCounter
 
-		oldArrI = self.internalReachNode(self,i)#Needs to be reinserted later
+		oldArrI = self.internalReachNode(i)#Needs to be reinserted later
 		rotationsCounter += self.delete(i)
 
-		insertionPoint = self.internalReachInsertionPoint(i)
-		if insertionPoint.getRank() < i:
-			insertionPoint.setRight(newNode)
-		elif insertionPoint.getRank() > i:
-			insertionPoint.setLeft(newNode)
-		newNode.setParent(insertionPoint)
+		# insertionPoint = self.internalReachInsertionPoint(i)
+		# if insertionPoint.getRank() < i:
+		# 	insertionPoint.setRight(newNode)
+		# elif insertionPoint.getRank() > i:
+		# 	insertionPoint.setLeft(newNode)
+		# newNode.setParent(insertionPoint)
 		#newNode is a leaf now with rank=key=i.Need to check if Rebalances are needed
-		rotationsCounter += self.rebalanceTree(newNode)
+		# rotationsCounter += self.rebalanceTree(newNode)
+		# if i == 0:
+		# 	self.minimum = newNode
+		# if i == self.size-1:
+		# 	self.maximum = newNode
+		# return rotationsCounter
+		rotationsCounter += self.attachNode(newNode)
+		oldArrI.setRank(i+1)
+		rotationsCounter += self.attachNode(oldArrI)
 		return rotationsCounter
+
+	def attachNode(self,node):
+		i = node.getRank
+		node.setRank(i)
+		insertionPoint = self.internalReachInsertionPoint(i)
+		if i > insertionPoint.getRank():
+			insertionPoint.setRight(node)
+		elif i < insertionPoint.getRank():
+			insertionPoint.setLeft(node)
+		node.setParent(insertionPoint)
+		rotationsCounter = 0
+		rotationsCounter += self.rebalanceTree(node)
+		if i == 0:
+			self.minimum = node
+		if i == self.size - 1:
+			self.maximum = node
+		return rotationsCounter
+
 
 	def internalReachInsertionPoint(self,i):
 		p = self.root
@@ -332,7 +359,28 @@ class AVLTreeList(object):
 	@returns: the number of rebalancing operation due to AVL rebalancing
 	"""
 	def delete(self, i):
-		return -1
+		if self.empty():
+			return 0
+
+		rotationsCounter = 0
+		p = self.root
+		while p.isRealNode():
+			if p.getRank()==i:
+				break
+			if p.getRank() > i:
+				p = p.getLeft()
+			elif p.getRank() < i :
+				p = p.getRight()
+		if p is self.root:
+			if p.getLeft().getHeight() > p,getRight().getHeight():
+				r = p.getRight()
+				l = p.getLeft().getRight()
+				p.root = p.getLeft()
+				p.setParent(None)
+
+
+
+		return rotationsCounter
 
 
 	"""returns the value of the first item in the list
@@ -359,7 +407,7 @@ class AVLTreeList(object):
 	def listToArray(self):
 		arr = [""]*self.size
 		p = self.minimum
-		while p.isRealNode():
+		while (not p is None) and p.isRealNode():
 			arr[p.getRank()] = str(p.getValue())
 			p = self.successor(p)
 		return arr
@@ -427,7 +475,33 @@ class AVLTreeList(object):
 	@returns: the absolute value of the difference between the height of the AVL trees joined
 	"""
 	def concat(self, lst):
-		return None
+		leftTree = self
+		rightTree = lst
+		x = rightTree.first()
+		pointerTree2 = x.getParent()
+		x.setParent(None)
+		virtSon = AVLNode(None)
+		virtSon.setAsVirtual()
+		pointerTree2.setLeft(virtSon)
+		delta = rightTree.size - leftTree.size
+		if delta > 0:
+			x.setLeft(leftTree.root)
+			while pointerTree2.getHeight() > leftTree.root.getHeight():
+				pointerTree2 = pointerTree2.getParent()
+			x.setParent(pointerTree2.getParent())
+			pointerTree2.getParent().setLeft(x)
+			pointerTree2.setParent(x)
+			self.rebalanceTree(x)
+		if delta == 0:
+			x.setLeft(leftTree.root)
+			x.setRight(rightTree.root)
+			leftTree.setParent(x)
+			rightTree.setParent(x)
+		if delta < 0:
+
+
+
+		return abs(delta)
 
 	"""searches for a *value* in the list
 
@@ -458,7 +532,7 @@ class AVLTreeList(object):
 		p = node
 		if not node.getRight().isRealNode():
 			while not p.getParent() is None:
-				if p.isLeftChild():
+				if p.isLeftSon():
 					return p
 				p = p.getParent()
 		else:
@@ -469,3 +543,8 @@ class AVLTreeList(object):
 
 
 
+L = AVLTreeList()
+L.insert(0,34)
+L.insert(1,15)
+L.insert(2,12)
+print(L.retrieve(0))
