@@ -207,6 +207,7 @@ class AVLTreeList(object):
 
 
 	def internalReachNode(self,i):
+		x=5
 		p = self.root
 		while not p.getRank() == i:
 			if p.getRank() == i:
@@ -384,7 +385,7 @@ class AVLTreeList(object):
 				l.setRight(r)
 				r.setParent(l)
 				self.minInSubTree(r).setLeft(baggage)
-				self.rebalanceTree(self.first())
+				rotationsCounter += self.rebalanceTree(self.first())
 			else:
 				r.setParent(None)
 				self.root.setAsVirtual()
@@ -393,7 +394,17 @@ class AVLTreeList(object):
 				attachPoint = self.minInSubTree(r)
 				attachPoint.setLeft(l)
 				l.setParent(attachPoint)
-				self.rebalanceTree(self.first())
+				rotationsCounter += self.rebalanceTree(self.first())
+			return rotationsCounter
+		elif not p is self.root:
+			parent = p.getParent()
+			if p.isLeftSon():
+				parent.setLeft(p.getLeft())
+				p.getLeft().setParent(parent)
+			else:
+				parent.setRight(p.getRight(()))
+				p.getRight().setParent(parent)
+			p.setAsVirtual()
 
 
 
