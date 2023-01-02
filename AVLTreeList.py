@@ -20,7 +20,6 @@ class AVLNode(object):
 		self.right = None
 		self.parent = None
 		self.height = -1 # Balance factor
-		self.key = 0 # Rank
 		self.size = 1
 		self.real = True
 
