@@ -27,6 +27,8 @@ class AVLNode(object):
 	def setAsVirtual(self):
 		self.real = False
 		self.size = 0
+		self.left = None
+		self.right = None
 
 	def getRank(self):
 		return self.key
@@ -372,15 +374,37 @@ class AVLTreeList(object):
 			elif p.getRank() < i :
 				p = p.getRight()
 		if p is self.root:
-			if p.getLeft().getHeight() > p,getRight().getHeight():
-				r = p.getRight()
-				l = p.getLeft().getRight()
-				p.root = p.getLeft()
-				p.setParent(None)
+			l = p.getLeft()
+			r = p.getRight()
+			if l.getHeight() > r.getHeight():
+				l.setParent(None)
+				self.root.setAsVirtual()
+				self.root = l
+				baggage = l.getRight()
+				l.setRight(r)
+				r.setParent(l)
+				self.minInSubTree(r).setLeft(baggage)
+				self.rebalanceTree(self.first())
+			else:
+				r.setParent(None)
+				self.root.setAsVirtual()
+				self.root = r
+				baggage = r.getLeft()
+				attachPoint = self.minInSubTree(r)
+				attachPoint.setLeft(l)
+				l.setParent(attachPoint)
+				self.rebalanceTree(self.first())
+
+
 
 
 
 		return rotationsCounter
+	def minInSubTree(self, node):
+		p = node
+		while p.isRealNode():
+			p = p.getLeft()
+		return p
 
 
 	"""returns the value of the first item in the list
@@ -498,6 +522,7 @@ class AVLTreeList(object):
 			leftTree.setParent(x)
 			rightTree.setParent(x)
 		if delta < 0:
+			x=5
 
 
 
